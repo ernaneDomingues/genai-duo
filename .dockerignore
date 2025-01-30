@@ -1,0 +1,8 @@
+#Ignora arquivos de cache
+__pycache__/
+
+# Ignora arquivos de teste
+tests/
+
+# Ignorar arquivos de log
+*.log

@@ -24,7 +24,7 @@ function displayMessage(message, sender) {
 async function getBotResponse(userMessage) {
     try {
         // Enviando a mensagem do usuário para a API Flask (via POST)
-        const response = await fetch('http://localhost:5000/ask', {  // Substitua com o URL correto da sua API
+        const response = await fetch('/api/ask', {  // Substitua com o URL correto da sua API
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
