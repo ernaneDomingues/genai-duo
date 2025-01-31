@@ -1,18 +1,23 @@
-# GenAI Project - Assistente Conversacional com Flask e Kubernetes
+# GenAI Duo - Assistente Conversacional com Flask e Kubernetes
 
-Este projeto é um assistente conversacional baseado em Flask e integrado com Google Gemini AI. Ele possui suporte a buscas inteligentes via Tavily Search e está preparado para deploy em Docker e Kubernetes.
+## 📌 Visão Geral
+Este é um projeto Flask baseado em **LLMs (Large Language Models)** que utiliza a API do **Google Gemini** para conversas inteligentes e a **Tavily Search API** para buscas na web. A aplicação é escalável e pode ser implantada na **AWS** usando **Kubernetes (EKS)**.
 
-## 📌 Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
 ```
-genai-project/
+genai-duo/
 │   ├── templates/              # Templates HTML do front-end
 │   ├── static/                 # Arquivos estáticos (CSS, JS, imagens)
 │   ├── agents/                 # Lógica dos agentes conversacionais
 │   │   ├── agents.py           # Configuração do chatbot e integração com Gemini AI
 │   ├── routes/                 # Definição das rotas da API
 │   │   ├── routes.py           # Configuração das rotas para interação com o chatbot
-│   ├── logs/                    # Arquivos de logs
+│   ├── logs/                   # Arquivos de logs
+│   ├── tests/                  # Arquivos de testes unitários
+│   │   ├── test_app.py         # Testes unitários do app.py
+│   │   ├── test_routes.py      # Testes unitários do routes.py
+│   │   ├── test_agents.py      # Testes unitários do agents.py
 │   ├── app.py                  # Inicialização do app Flask e configuração geral
 │   ├── requirements.txt        # Dependências do projeto
 │   ├── Dockerfile              # Configuração do container Docker
@@ -20,30 +25,28 @@ genai-project/
 │   │   ├── deployment.yaml
 │   │   ├── service.yaml
 │   │   ├── ingress.yaml
-│   ├── aws-architecture.png    # Arquitetura do projeto na AWS
 │   ├── .env.example            # Exemplo do arquivo de variáveis de ambiente
 │   └── README.md               # Documentação do projeto
 ```
 
 ---
 
-## 🔎 Explicação dos Principais Arquivos
+## 📝 Explicação dos Principais Arquivos
 
-### `agents.py`
-Este arquivo contém a implementação do agente conversacional. Ele integra a API do Google Gemini AI para fornecer respostas inteligentes e usa o Tavily Search para buscas na web. Também define a lógica do fluxo de conversa e a moderação de conteúdo sensível.
+### 📌 `agents.py`
+- Implementa o **Google Gemini AI** para conversas.
+- Usa a **Tavily Search API** para buscas na web.
+- Define um fluxo de controle para decidir entre responder diretamente ou realizar uma busca.
 
-### `routes.py`
-Define as rotas da API do Flask. Contém:
-- `/`: Rota para exibir a interface do chatbot.
-- `/api/ask`: Rota para receber perguntas e retornar respostas usando o agente conversacional.
+### 📌 `routes.py`
+- Define **rotas da API** com Flask.
+- `POST /api/ask` recebe uma pergunta e retorna uma resposta do agente conversacional.
+- `GET /` renderiza a interface do chatbot.
 
-### `app.py`
-Arquivo principal para inicializar o Flask. Ele:
-- Configura as blueprints das rotas.
-- Carrega variáveis de ambiente.
-- Configura CORS.
-- Implementa verificações de saúde (`/health`).
-- Garante segurança com HSTS quando usando HTTPS.
+### 📌 `app.py`
+- Inicializa o **Flask** e registra as rotas.
+- Configura **CORS** e segurança (HSTS).
+- Expõe a rota `/health` para verificação de status.
 
 ---
 
@@ -67,21 +70,30 @@ SECRET_KEY=your_secret_key
 CORS_ORIGINS=*
 ```
 
-### 3️⃣ Instalar Dependências
+### 3️⃣ Configuração Local
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/ernaneDomingues/genai-duo.git
+   cd genai-duo
+   ```
+2. Mova o arquivo .env para a pasta genai-duo.
 
-```bash
-pip install -r requirements.txt
-```
+3. Crie um ambiente virtual e instale as dependências:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # (Linux/macOS)
+   venv\Scripts\activate     # (Windows)
+   pip install -r requirements.txt
+   ```
+4. Execute a aplicação Flask:
+   ```bash
+   python app.py
+   ```
+5. Acesse no navegador: `http://127.0.0.1:5000`
 
-### 4️⃣ Rodar Localmente
+---
 
-```bash
-python app.py
-```
-
-Acesse a interface no navegador: [http://127.0.0.1:5000](http://127.0.0.1:5000)
-
-### 5️⃣ Executar com Docker
+### 4️⃣ Executar com Docker
 
 **Construir a imagem:**
 ```bash
@@ -99,21 +111,22 @@ docker logs -f flask-container
 ```
 
 
-### 6️⃣ Deploy no Kubernetes
+### 5️⃣ Deploy no Kubernetes (EKS)
+1. Configure o **kubectl** para acessar o cluster EKS.
+2. **Crie os deployments e services:**
+   ```bash
+   kubectl apply -f k8s/
+   ```
+3. **Verifique os pods:**
+   ```bash
+   kubectl get pods
+   ```
+4. **Exponha o serviço:**
+   ```bash
+   kubectl port-forward svc/genai-service 5000:5000
+   ```
 
-**Aplicar os arquivos de configuração:**
-```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-kubectl apply -f k8s/ingress.yaml  # Opcional
-```
-
-**Verificar os pods:**
-```bash
-kubectl get pods
-```
-
-### 7️⃣ Testar API
+### 6️⃣ Testar API
 
 ```bash
 curl -X POST http://localhost:5000/api/ask -H "Content-Type: application/json" -d '{"question": "O que é Machine Learning?"}'
@@ -125,6 +138,58 @@ Saída esperada:
   "answer": "Machine Learning é um campo da inteligência artificial que ..."
 }
 ```
+
+---
+
+## 🏗️ Arquitetura AWS
+
+A arquitetura do projeto na AWS utiliza **EKS (Elastic Kubernetes Service)** para escalar o Flask e gerenciar os recursos.
+
+### 📌 Componentes:
+1. **Usuário → Route 53 + CloudFront**
+2. **Aplicação Flask → Amazon EKS**
+3. **Banco de Dados → Amazon RDS (PostgreSQL)**
+4. **Cache → Amazon ElastiCache (Redis)**
+5. **Monitoramento → CloudWatch**
+6. **CI/CD → CodePipeline + ECR**
+
+```
+          [ Usuário ]
+              │
+       ┌─────▼──────┐
+       │ Route 53   │
+       └─────┬──────┘
+             │
+       ┌────▼───────┐
+       │ CloudFront │
+       └─────┬──────┘
+             │
+       ┌────▼──────┐
+       │   EKS    │  (Flask App)
+       ├──────────┤
+       │   API    │
+       └────┬─────┘
+            │
+     ┌─────▼──────┐
+     │ ElastiCache│
+     └─────┬──────┘
+            │
+   ┌────────▼────────┐
+   │    RDS (PostgreSQL) │
+   └────────────────────┘
+            │
+     ┌─────▼───────┐
+     │ CloudWatch  │  (Logs e Monitoramento)
+     └─────────────┘
+```
+
+### 🚀 Fluxo de Deploy na AWS
+1️⃣ **CodePipeline** recebe mudanças do repositório GitHub/GitLab.
+2️⃣ **CodeBuild** cria a imagem Docker e armazena no **Amazon ECR**.
+3️⃣ **EKS** atualiza os pods automaticamente.
+4️⃣ **CloudWatch** monitora logs e métricas.
+
+---
 
 ---
 
