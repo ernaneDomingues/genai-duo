@@ -3,6 +3,14 @@
 ## 📌 Visão Geral
 Este é um projeto Flask baseado em **LLMs (Large Language Models)** que utiliza a API do **Google Gemini** para conversas inteligentes e a **Tavily Search API** para buscas na web. A aplicação é escalável e pode ser implantada na **AWS** usando **Kubernetes (EKS)**.
 
+
+## 🌍 Acessando o Chat no Heroku
+
+O projeto foi implantado no Heroku para testes. Para experimentar, basta acessar o link abaixo:
+
+[GenAI Duo - Heroku](https://genai-duo-56838a644146.herokuapp.com/)
+
+
 ## 📂 Estrutura do Projeto
 
 ```
